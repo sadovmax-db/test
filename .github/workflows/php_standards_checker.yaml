@@ -18,7 +18,7 @@ jobs:
         
       - name: Install the drupal/coder(PHPCS)
         run: |
-          sudo apk add jq
+          sudo apt install jq
           VERSION=$(jq -r '.["packages"][] | select(.name == "drupal/coder") | .version' composer.lock)
           echo "Version the drupal/coder = $VERSION"
           composer global config --no-plugins allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
