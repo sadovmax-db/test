@@ -32,7 +32,6 @@ jobs:
         uses: reviewdog/action-setup@v1
         with:
           reviewdog_version: latest
-
       - name: Configuring diff file
         run: |
           git config --global --add safe.directory .
