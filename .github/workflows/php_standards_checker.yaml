@@ -32,6 +32,7 @@ jobs:
         uses: reviewdog/action-setup@v1
         with:
           reviewdog_version: latest
+
       - name: Configuring diff file
         run: |
           git config --global --add safe.directory .
@@ -45,14 +46,14 @@ jobs:
             exit 0
           fi
         
-        - name: Run the phpcs
-          run: |
-            ~/.composer/vendor/bin/phpcs
-            --extensions=css,inc,install,module,php,profile,test 
-            --standard=Drupal,DrupalPractice 
-            --report=checkstyle `cat /tmp/grep_checking` | 
-            reviewdog
-            -f="checkstyle" -name="PHPCS" 
-            -reporter="github-pr-review" -fail-level=any 
-            -filter-mode=nofilter -tee
+      - name: Run the phpcs
+        run: |
+          ~/.composer/vendor/bin/phpcs
+          --extensions=css,inc,install,module,php,profile,test 
+          --standard=Drupal,DrupalPractice 
+          --report=checkstyle `cat /tmp/grep_checking` | 
+          reviewdog
+          -f="checkstyle" -name="PHPCS" 
+          -reporter="github-pr-review" -fail-level=any 
+          -filter-mode=nofilter -tee
 
