@@ -18,7 +18,7 @@ jobs:
         
       - name: Install the drupal/coder(PHPCS)
         run: |
-          sudo apk add jq
+          sudo apt install jq
           VERSION=$(jq -r '.["packages"][] | select(.name == "drupal/coder") | .version' composer.lock)
           echo "Version the drupal/coder = $VERSION"
           composer global config --no-plugins allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
@@ -37,11 +37,9 @@ jobs:
         run: |
           git config --global --add safe.directory .
           git diff --name-only -r origin/$GITHUB_BASE_REF origin/$GITHUB_HEAD_REF |\
-          grep -E "web/(modules|themes|profiles)/custom" |\
-          tr "\n" " " > /tmp/check
-          grep -e 'php\|module\|inc\|install\|profile\|theme\|yml\|phpu' /tmp/check > /tmp/grep_checking || \
-          if [ ! -s /tmp/grep_checking ]; then
-            rm /tmp/grep_checking
+          grep -E "web/(modules|themes|profiles)/custom" | \
+          grep -E '\.php$|\.module$|\.inc$|\.install$|\.profile$|\.theme$|\.yml$|\.phpu$' > /tmp/grep|| true
+          if [ ! -s /tmp/grep ]; then
             printf "PHPCS has nothing to check."
             exit 0
           fi
@@ -51,7 +49,7 @@ jobs:
           ~/.composer/vendor/bin/phpcs
           --extensions=css,inc,install,module,php,profile,test 
           --standard=Drupal,DrupalPractice 
-          --report=checkstyle `cat /tmp/grep_checking` | 
+          --report=checkstyle `cat /tmp/grep` | 
           reviewdog
           -f="checkstyle" -name="PHPCS" 
           -reporter="github-pr-review" -fail-level=any 
