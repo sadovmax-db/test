@@ -20,6 +20,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: 'npm'
 
       - name: Install Yarn
         run: |
@@ -40,7 +41,7 @@ jobs:
 
       - name: Install ESlint
         run: |
-            sudo apk add jq
+            sudo apt install jq
             VERSION=$(jq -r '.packages[] | select(.name == "drupal/core") | .version' composer.lock)
             echo "Version the drupal/core = $VERSION"
             mkdir -p web/core
