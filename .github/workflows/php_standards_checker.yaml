@@ -39,6 +39,7 @@ jobs:
           git diff --name-only -r origin/$GITHUB_BASE_REF origin/$GITHUB_HEAD_REF |\
           grep -E "web/(modules|themes|profiles)/custom" | \
           grep -E '\.php$|\.module$|\.inc$|\.install$|\.profile$|\.theme$|\.yml$|\.phpu$' > /tmp/grep|| true
+          cat /tmp/grep
         
       - name: Run the phpcs
         env:
