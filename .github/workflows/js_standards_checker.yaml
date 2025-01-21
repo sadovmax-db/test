@@ -76,5 +76,5 @@ jobs:
           --no-error-on-unmatched-pattern |
           reviewdog -f=eslint -name="ESLint" \
           -reporter=github-pr-review \
-          -fail-on-error -filter-mode=nofilter -tee
+          -fail-level=any -filter-mode=nofilter -tee
         timeout-minutes: 5
