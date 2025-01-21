@@ -37,23 +37,20 @@ jobs:
         run: |
           git config --global --add safe.directory .
           git diff --name-only -r origin/$GITHUB_BASE_REF origin/$GITHUB_HEAD_REF |\
-          grep -E "web/(modules|themes|profiles)/custom" |\
-          tr "\n" " " > /tmp/check
-          grep -e 'php\|module\|inc\|install\|profile\|theme\|yml\|phpu' /tmp/check > /tmp/grep_checking || \
-          if [ ! -s /tmp/grep_checking ]; then
-            rm /tmp/grep_checking
-            printf "PHPCS has nothing to check."
-            exit 0
-          fi
+          grep -E "web/(modules|themes|profiles)/custom" | \
+          grep -E '\.php$|\.module$|\.inc$|\.install$|\.profile$|\.theme$|\.yml$|\.phpu$' > /tmp/grep|| true
+          cat /tmp/grep
         
       - name: Run the phpcs
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          ~/.composer/vendor/bin/phpcs
-          --extensions=css,inc,install,module,php,profile,test 
-          --standard=Drupal,DrupalPractice 
-          --report=checkstyle `cat /tmp/grep_checking` | 
-          reviewdog
-          -f="checkstyle" -name="PHPCS" 
-          -reporter="github-pr-review" -fail-level=any 
+          ~/.composer/vendor/bin/phpcs \
+          --extensions=css,inc,install,module,php,profile,test \
+          --standard=Drupal,DrupalPractice \
+          --report=checkstyle `cat /tmp/grep` | 
+          reviewdog \
+          -f="checkstyle" -name="PHPCS" \
+          -reporter="github-pr-review" -fail-level=any \
           -filter-mode=nofilter -tee
 
