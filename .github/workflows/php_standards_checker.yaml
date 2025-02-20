@@ -21,23 +21,12 @@ jobs:
         with:
           reviewdog_version: latest
         
-      - name: Install the GrumPHP
-        run: |
-          sudo apt install jq
-          VERSION=$(jq -r '.["packages"][] | select(.name == "drupal/coder") | .version' composer.lock)
-          echo "Version the drupal/coder = $VERSION"
-          composer global config --no-plugins allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
-          if [ -n "$VERSION" ]; then
-            composer global require "drupal/coder:^$VERSION"
-          else
-            composer global require drupal/coder
-          fi
-      
       - name: Configuring diff file
         run: |
           # Add the current directory to the list of safe directories for Git
           git config --global --add safe.directory .
           export GIT_CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r --diff-filter=ACM origin/$GITHUB_BASE_REF origin/$GITHUB_HEAD_REF)
+          cd scripts/grumphp && composer install && cd ../..
               cat $GIT_CHANGED_FILES
               if [ -z "$GIT_CHANGED_FILES" ]; then
                 echo ----------------------------
