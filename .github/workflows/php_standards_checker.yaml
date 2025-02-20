@@ -15,8 +15,13 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+
+      - name: Installing reviewdog
+        uses: reviewdog/action-setup@v1
+        with:
+          reviewdog_version: latest
         
-      - name: Install the drupal/coder(PHPCS)
+      - name: Install the GrumPHP
         run: |
           sudo apt install jq
           VERSION=$(jq -r '.["packages"][] | select(.name == "drupal/coder") | .version' composer.lock)
@@ -28,32 +33,38 @@ jobs:
             composer global require drupal/coder
           fi
       
-      - name: Installing reviewdog
-        uses: reviewdog/action-setup@v1
-        with:
-          reviewdog_version: latest
-
       - name: Configuring diff file
         run: |
+          # Add the current directory to the list of safe directories for Git
           git config --global --add safe.directory .
-          git diff --name-only -r origin/$GITHUB_BASE_REF origin/$GITHUB_HEAD_REF |\
-          grep -E "web/(modules|themes|profiles)/custom" |\
-          tr "\n" " " > /tmp/check
-          grep -e 'php\|module\|inc\|install\|profile\|theme\|yml\|phpu' /tmp/check > /tmp/grep_checking || \
-          if [ ! -s /tmp/grep_checking ]; then
-            rm /tmp/grep_checking
-            printf "PHPCS has nothing to check."
-            exit 0
-          fi
-        
-      - name: Run the phpcs
+          export GIT_CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r --diff-filter=ACM origin/$GITHUB_BASE_REF origin/$GITHUB_HEAD_REF)
+              cat $GIT_CHANGED_FILES
+              if [ -z "$GIT_CHANGED_FILES" ]; then
+                echo ----------------------------
+                echo There are no files to check.
+                echo ----------------------------
+                exit 0
+              fi
+          
+          - name: Run the GrumPHP(PHPCS)
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          ~/.composer/vendor/bin/phpcs
-          --extensions=css,inc,install,module,php,profile,test 
-          --standard=Drupal,DrupalPractice 
-          --report=checkstyle `cat /tmp/grep_checking` | 
-          reviewdog
-          -f="checkstyle" -name="PHPCS" 
-          -reporter="github-pr-review" -fail-level=any 
-          -filter-mode=nofilter -tee
+          # Temporary files for capturing streams
+          STDOUT_FILE=$(mktemp)
+          STDERR_FILE=$(mktemp)
+          # Run GrumPHP and handle streams
+          echo "$GIT_CHANGED_FILES" \
+            | ./scripts/grumphp/vendor/bin/grumphp run --tasks=phpcs --no-interaction --config=scripts/grumphp/grumphp.yml \
+            > >(tee "$STDOUT_FILE") \
+            2> >(tee "$STDERR_FILE" >&2) || true
+          # Check if STDERR_FILE is non-empty
+          if [ -s "$STDERR_FILE" ]; then
+            # Pass stderr to reviewdog
+            cat "$STDERR_FILE" | ./bin/reviewdog -fail-level=any -f=checkstyle -name="PHPCS GrumPHP" -reporter=gitlab-mr-discussion -filter-mode=nofilter
+          else
+            echo "No errors found in PHP files. Skipping reviewdog."
+          fi
+          # Clean up temporary files
+          rm -f "$STDOUT_FILE" "$STDERR_FILE"
 
