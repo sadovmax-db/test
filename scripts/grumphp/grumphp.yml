@@ -1,0 +1,40 @@
+grumphp:
+    hide_circumvention_tip: true
+    ascii:
+        failed: ~
+        succeeded: ~
+    fixer:
+        enabled: true
+        fix_by_default: false
+    environment:
+        variables:
+            GRUMPHP_COMPOSER_DIR: "scripts/grumphp"
+            GRUMPHP_BIN_DIR: "scripts/grumphp/vendor/bin"
+    tasks:
+        phpcs:
+            standard: [Drupal,DrupalPractice]
+            whitelist_patterns:
+                - /^web\/modules\/custom\/(.*)/
+                - /^web\/themes\/custom\/(.*)/
+                - /^web\/profiles\/custom\/(.*)/
+            triggered_by:
+                - inc
+                - install
+                - module
+                - php
+                - profile
+                - theme
+                - twig
+                - yml
+            report: checkstyle
+        eslint:
+            bin: node_modules/.bin/eslint
+            triggered_by: [js]
+            config: web/.eslintrc.json
+            debug: false
+            quiet: false
+            whitelist_patterns:
+                - /^web\/modules\/custom\/(.*)/
+                - /^web\/themes\/custom\/(.*)/
+                - /^web\/profiles\/custom\/(.*)/
+

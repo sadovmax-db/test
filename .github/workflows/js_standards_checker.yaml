@@ -1,0 +1,79 @@
+name: 'JS Coding standards validation via GrumPHP'
+
+on: pull_request
+
+jobs:
+  eslint-checker:
+    name: 'ESLint Code standards validation'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      repository-projects: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+        
+      - name: Node js installer
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Yarn and ESlint
+        run: |
+          npm -v
+          npm install yarn
+          npm install eslint eslint-config-drupal eslint-config-airbnb-base eslint-plugin-yml
+
+      - name: Install ESlint dependencies
+        run: |
+            VERSION=$(composer show drupal/core --locked | grep 'versions' | awk '{print $4}')
+            echo "Version the drupal/core = $VERSION"
+            mkdir -p web/core
+            cd web
+            wget https://git.drupalcode.org/project/drupal/raw/$VERSION/.eslintrc.json
+            wget https://git.drupalcode.org/project/drupal/raw/$VERSION/.eslintignore
+            cd core
+            wget https://git.drupalcode.org/project/drupal/raw/$VERSION/core/.eslintignore
+            wget https://git.drupalcode.org/project/drupal/raw/$VERSION/core/.eslintrc.jquery.json
+            wget https://git.drupalcode.org/project/drupal/raw/$VERSION/core/.eslintrc.json
+            wget https://git.drupalcode.org/project/drupal/raw/$VERSION/core/.eslintrc.legacy.json
+            wget https://git.drupalcode.org/project/drupal/raw/$VERSION/core/.eslintrc.passing.json
+            cd ../..
+      
+      - name: Installing reviewdog
+        uses: reviewdog/action-setup@v1
+        with:
+          reviewdog_version: latest
+      
+      - name: Configuring diff file
+        run: |
+          # Add the current directory to the list of safe directories for Git
+          git config --global --add safe.directory .
+          export GIT_CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r --diff-filter=ACM origin/$GITHUB_BASE_REF origin/$GITHUB_HEAD_REF)
+          cd scripts/grumphp && composer install && cd ../..
+          cat $GIT_CHANGED_FILES
+
+      - name: Run GrumPHP(Eslint)
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Temporary files for capturing streams
+          STDOUT_FILE=$(mktemp)
+          STDERR_FILE=$(mktemp)
+          # Run GrumPHP and handle streams
+          echo "$GIT_CHANGED_FILES" \
+            | ./scripts/grumphp/vendor/bin/grumphp run --tasks=eslint --no-interaction --config=scripts/grumphp/grumphp.yml \
+            > >(tee "$STDOUT_FILE") \
+            2> "$STDERR_FILE" || true
+          # Check if STDERR_FILE is non-empty
+          if [ -s "$STDERR_FILE" ]; then
+            # Pass stderr to reviewdog
+            cat "$STDERR_FILE" | reviewdog -fail-level=any -f=eslint -name="Eslint GrumPHP" -reporter=github-pr-review -filter-mode=nofilter
+          else
+            echo "No errors found in JS files. Skipping reviewdog."
+          fi
+          # Clean up temporary files
+          rm -f "$STDOUT_FILE" "$STDERR_FILE"
