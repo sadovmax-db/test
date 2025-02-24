@@ -71,7 +71,7 @@ jobs:
           # Check if STDERR_FILE is non-empty
           if [ -s "$STDERR_FILE" ]; then
             # Pass stderr to reviewdog
-            cat "$STDERR_FILE" | reviewdog -fail-level=any -f=checkstyle -name="Eslint GrumPHP" -reporter=github-pr-review -filter-mode=nofilter
+            cat "$STDERR_FILE" | reviewdog -fail-level=any -f=eslint -name="Eslint GrumPHP" -reporter=github-pr-review -filter-mode=nofilter
           else
             echo "No errors found in JS files. Skipping reviewdog."
           fi
