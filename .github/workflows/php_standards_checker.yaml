@@ -40,7 +40,7 @@ jobs:
           echo "$GIT_CHANGED_FILES" \
             | ./scripts/grumphp/vendor/bin/grumphp run --tasks=phpcs --no-interaction --config=scripts/grumphp/grumphp.yml \
             > >(tee "$STDOUT_FILE") \
-            2> >(tee "$STDERR_FILE" >&2) || true
+            2> "$STDERR_FILE" || true
           # Check if STDERR_FILE is non-empty
           if [ -s "$STDERR_FILE" ]; then
             # Pass stderr to reviewdog
