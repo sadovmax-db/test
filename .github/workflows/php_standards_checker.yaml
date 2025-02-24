@@ -1,4 +1,4 @@
-name: 'PHP Coding standards validation'
+name: 'PHP Coding standards validation via GrumPHP'
 
 on: pull_request
 
