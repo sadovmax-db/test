@@ -10,34 +10,13 @@ grumphp:
         variables:
             GRUMPHP_COMPOSER_DIR: "scripts/grumphp"
             GRUMPHP_BIN_DIR: "scripts/grumphp/vendor/bin"
-    #testsuites:                        # TODO Uncomment it for the git commit validations.
-    #    git_commit_msg:                # TODO Uncomment it for the git commit validations.
-    #        tasks:                     # TODO Uncomment it for the git commit validations.
-    #            - git_commit_message   # TODO Uncomment it for the git commit validations.   
     tasks:
-        #git_branch_name:                                                                                                                                       #   TODO Uncomment it for the git branch validations.
-        #    whitelist:                                                                                                                                         #   TODO Uncomment it for the git branch validations.
-        #        - "#^master|dev|<your_branch>(release|hotfix)/<your_project>-\\d+(\\.\\d+){2}|feature/<your_project>-\\d+|epic/([a-z0-9]+)(-[a-z0-9]+)*$#"     #   TODO Uncomment it for the git branch validations.
-        #git_commit_message:                                                                                                                                    #   TODO Uncomment it for the git branch validations.
-        #    enforce_capitalized_subject: false                                                                                                                 #   TODO Uncomment it for the git branch validations.
-        #    max_body_width: 0                                                                                                                                  #   TODO Uncomment it for the git branch validations.
-        #    max_subject_width: 0                                                                                                                               #   TODO Uncomment it for the git branch validations.
-        #    matchers:                                                                                                                                          #   TODO Uncomment it for the git branch validations.
-        #        - "#^<your_project>-\\d+ |^Merge branch #"                                                                                                     #   TODO Uncomment it for the git branch validations.
         phpcs:
             standard: [Drupal,DrupalPractice]
             whitelist_patterns:
-                - "web/modules/custom"
-                - "web/themes/custom"
-                - "web/profiles/custom"
-            ignore_patterns:
-                - node_modules/
-                - tests/
-                - cfg/
-                - libraries/
-                - vendor/
-                - "*.min.*"
-                - "web/core/*"
+                - /^web\/modules\/custom\/(.*)/
+                - /^web\/themes\/custom\/(.*)/
+                - /^web\/profiles\/custom\/(.*)/
             triggered_by:
                 - inc
                 - install
