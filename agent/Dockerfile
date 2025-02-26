@@ -2,7 +2,7 @@ FROM zabbix/zabbix-agent2:alpine-7.2-latest
 
 USER root
 # Install Go and Git (required for 'go get')
-RUN apk add --no-cache go git
+RUN apk add go git
 
 # Install zabbix_agent_bench and move the binary to a global PATH
 RUN go install github.com/cavaliercoder/zabbix_agent_bench@latest \
