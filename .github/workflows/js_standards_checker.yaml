@@ -52,7 +52,7 @@ jobs:
         run: |
           # Add the current directory to the list of safe directories for Git
           git config --global --add safe.directory .
-          export GIT_CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r --diff-filter=ACM origin/$GITHUB_BASE_REF origin/$GITHUB_HEAD_REF)
+          export GIT_CHANGED_FILES=$(git diff --name-only --diff-filter=ACM origin/$GITHUB_BASE_REF...origin/$GITHUB_HEAD_REF)
           cd scripts/grumphp && composer install && cd ../..
           cat $GIT_CHANGED_FILES
 
@@ -64,7 +64,7 @@ jobs:
           STDOUT_FILE=$(mktemp)
           STDERR_FILE=$(mktemp)
           # Run GrumPHP and handle streams
-          echo "$GIT_CHANGED_FILES" \
+          echo "$GIT_CHANGED_FILES" \PHP
             | ./scripts/grumphp/vendor/bin/grumphp run --tasks=eslint --no-interaction --config=scripts/grumphp/grumphp.yml \
             > >(tee "$STDOUT_FILE") \
             2> "$STDERR_FILE" || true
