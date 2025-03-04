@@ -27,7 +27,7 @@ jobs:
           git config --global --add safe.directory .
           export GIT_CHANGED_FILES=$(git diff --name-only --diff-filter=ACM origin/$GITHUB_BASE_REF...origin/$GITHUB_HEAD_REF)
           cd scripts/grumphp && composer install && cd ../..
-          cat "$GIT_CHANGED_FILES"
+          cat $GIT_CHANGED_FILES
 
       - name: Run GrumPHP(PHPCS)
         env:
