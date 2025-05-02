@@ -1,0 +1,3 @@
+# Ignore dependencies for grumphp
+/vendor/
+

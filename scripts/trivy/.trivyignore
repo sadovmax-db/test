@@ -1,0 +1,4 @@
+# Ignore the 'Add HEALTHCHECK Dockerfile' rule.
+DS026
+# This vulnerability fixed but Trivy triggers on it. Link to issue: https://www.drupal.org/project/drupal/issues/3356283
+CVE-2023-29530

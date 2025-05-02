@@ -3,14 +3,48 @@ grumphp:
     ascii:
         failed: ~
         succeeded: ~
-    fixer:
-        enabled: true
-        fix_by_default: false
+    git_hook_variables:
+        ### Configuration for work in DDEV
+        EXEC_GRUMPHP_COMMAND: ddev exec php
+        ### Configuration for work in Docker
+        # EXEC_GRUMPHP_COMMAND: docker exec -i drupal-local_php
     environment:
         variables:
             GRUMPHP_COMPOSER_DIR: "scripts/grumphp"
             GRUMPHP_BIN_DIR: "scripts/grumphp/vendor/bin"
     tasks:
+        git_commit_message:
+            allow_empty_message: false
+            enforce_capitalized_subject: false
+            enforce_no_subject_punctuations: false
+            enforce_no_subject_trailing_period: false
+            enforce_single_lined_subject: true
+            max_body_width: 0
+            max_subject_width: 0
+            matchers:
+                ### Jira format: 'JIRA-123: Description'
+                # Please use Jira format "JIRA-123: Description": "/^JIRA-[0-9]{1,4}: .+/"        #TODO Uncomment this line if you want to allow this rule
+                ### BitBucket format: '#123: Description'
+                #Please use Bitbucket format:  "/^#[0-9]{1,4}: .+/"                               #TODO Uncomment this line if you want to allow this rule
+                ### Trello format: 'Trello #abcdef12: Description'                                 
+                #Please use Trello format: "/^Trello #[a-zA-Z0-9]{8}: .+/"                        #TODO Uncomment this line if you want to allow this rule
+                ### Redmine format: 'Redmine #1234: Description'                                   
+                Please use Redmine format: "/^Redmine #[0-9]{1,5}: .+/"                           #TODO Uncomment this line if you want to allow this rule 
+                ### Only letters, numbers, and characters #, :, _, - are allowed
+                # Only letters, numbers, and characters - "#, :, _, - ": "/^[a-zA-Z0-9 #:_-]+$/"  #TODO Uncomment this line if you want to allow this rule
+        git_branch_name:
+            whitelist:
+                # TODO Uncomment the following lines if you want to allow these formats
+                # - "/^JIRA_[0-9]{1,4}_.+/"   # Jira format
+                # - "/^bb_[0-9]{1,4}_.+/"     # Bitbucket format
+                # - "/^tr_[a-zA-Z0-9]{8}_.+/"  # Trello format
+                - "/^R[0-9]{1,4}_.+/"      # Redmine format
+            blacklist:
+            # List branch names to not allow changes.
+                - "master"
+                - "main"
+            additional_modifiers: ''
+            allow_detached_head: true
         phpcs:
             standard: [Drupal,DrupalPractice]
             whitelist_patterns:
@@ -27,9 +61,17 @@ grumphp:
                 - twig
                 - yml
             report: checkstyle
+        phpmd:
+            whitelist_patterns:
+                - /^web\/modules\/custom\/(.*)/
+                - /^web\/themes\/custom\/(.*)/
+                - /^web\/profiles\/custom\/(.*)/
+            report_format: text
+            ruleset: ['cleancode', 'codesize', 'naming']
+            triggered_by: ['php', 'phtml', 'inc', 'install', 'module', 'profile', 'theme']
         eslint:
             bin: node_modules/.bin/eslint
-            triggered_by: [js]
+            triggered_by: ['js', 'jsx', 'ts', 'tsx']
             config: web/.eslintrc.json
             debug: false
             quiet: false
@@ -37,4 +79,3 @@ grumphp:
                 - /^web\/modules\/custom\/(.*)/
                 - /^web\/themes\/custom\/(.*)/
                 - /^web\/profiles\/custom\/(.*)/
-
