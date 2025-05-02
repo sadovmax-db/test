@@ -21,10 +21,8 @@ jobs:
         with:
           node-version: 22
 
-      - name: Install Yarn and ESlint
+      - name: Install ESlint
         run: |
-          npm -v
-          npm install yarn
           npm install eslint eslint-config-drupal eslint-config-airbnb-base eslint-plugin-yml
 
       - name: Install ESlint dependencies

@@ -25,15 +25,11 @@ jobs:
         run: |
           # Add the current directory to the list of safe directories for Git
           git config --global --add safe.directory .
-          export GIT_CHANGED_FILES=$(git diff --name-only --diff-filter=d origin/$GITHUB_BASE_REF origin/$GITHUB_HEAD_REF)
+          export GIT_CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r --diff-filter=ACM origin/$GITHUB_BASE_REF origin/$GITHUB_HEAD_REF)
           cat $GIT_CHANGED_FILES
-          
-
-      - name: Configure GrumPHP
-        run: |
           cd scripts/grumphp && composer install && cd ../..
 
-      - name: Run GrumPHP(PHPCS)
+      - name: Run GrumPHP(PHPMD)
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -42,7 +38,7 @@ jobs:
           STDERR_FILE=$(mktemp)
           # Run GrumPHP and handle streams
           echo "$GIT_CHANGED_FILES" \
-            | ./scripts/grumphp/vendor/bin/grumphp run --tasks=phpcs --no-interaction --config=scripts/grumphp/grumphp.yml \
+            | ./scripts/grumphp/vendor/bin/grumphp run --tasks=phpmd --no-interaction --config=scripts/grumphp/grumphp.yml \
             > >(tee "$STDOUT_FILE") \
             2> "$STDERR_FILE" || true
           # Check if STDERR_FILE is non-empty
