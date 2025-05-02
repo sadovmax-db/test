@@ -43,8 +43,9 @@ jobs:
             2> "$STDERR_FILE" || true
           # Check if STDERR_FILE is non-empty
           if [ -s "$STDERR_FILE" ]; then
-            # Pass stderr to reviewdog
-            cat "$STDERR_FILE" | reviewdog -fail-level=any -f=checkstyle -name="PHPCS GrumPHP" -reporter=github-pr-review -filter-mode=nofilter
+          cat "$STDERR_FILE" \
+            | sed -r "s/([0-9]+)\s+/\1:/gI" \
+            | ./bin/reviewdog -fail-level=any -f=phpstan -name="PHPMD GrumPHP"  -reporter=github-pr-review -filter-mode=nofilter
           else
             echo "No errors found in PHP files. Skipping reviewdog."
           fi
