@@ -25,8 +25,8 @@ jobs:
         run: |
           # Add the current directory to the list of safe directories for Git
           git config --global --add safe.directory .
-          export GIT_CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r --diff-filter=ACM origin/$GITHUB_BASE_REF origin/$GITHUB_HEAD_REF)
-          cat $GIT_CHANGED_FILES
+          GIT_CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r --diff-filter=ACM origin/$GITHUB_BASE_REF origin/$GITHUB_HEAD_REF)        
+          echo "$GIT_CHANGED_FILES"
           cd scripts/grumphp && composer install && cd ../..
 
       - name: Run GrumPHP(PHPMD)
