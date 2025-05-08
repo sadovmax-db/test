@@ -10,6 +10,7 @@ jobs:
       contents: write
       pull-requests: write
       repository-projects: write
+    environment: ${{ vars.REVIEWDOG_FAILED }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -21,9 +22,6 @@ jobs:
         with:
           reviewdog_version: latest
 
-      - name: Initialize REVIEWDOG_FAILED variable
-        run: |
-          REVIEWDOG_FAILED=0
         
       - name: Configuring diff file
         run: |
