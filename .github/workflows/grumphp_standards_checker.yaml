@@ -20,8 +20,9 @@ jobs:
         uses: reviewdog/action-setup@v1
         with:
           reviewdog_version: latest
+
+      - name: Initialize REVIEWDOG_FAILED variable
         run: |
-          # Initialize REVIEWDOG_FAILED variable
           REVIEWDOG_FAILED=0
         
       - name: Configuring diff file
@@ -30,7 +31,10 @@ jobs:
           git config --global --add safe.directory .
           GIT_CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r --diff-filter=ACM origin/$GITHUB_BASE_REF origin/$GITHUB_HEAD_REF)        
           echo "$GIT_CHANGED_FILES"
-          cd scripts/grumphp && composer install && cd ../..
+          
+      - name: Install GrumPHP dependencies
+        run: | 
+          cd scripts/grumphp && composer install && cd ../..    
       
       - name: Install ESlint dependencies
         run: |
