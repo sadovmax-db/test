@@ -110,6 +110,13 @@ jobs:
             echo "No errors found in JS files. Skipping reviewdog."
           fi
           # Clean up temporary files
-          rm -f "$STDOUT_FILE" "$STDERR_FILE"      
-      
+          rm -f "$STDOUT_FILE" "$STDERR_FILE"
 
+      - name: Check reviewdog status
+        run: | 
+        if [ "$REVIEWDOG_FAILED" -eq 1 ]; then
+          echo "❌ One or more reviewdog checks failed."
+          exit 1
+        else
+          echo "✅ All reviewdog checks passed."
+        fi
