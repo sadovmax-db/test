@@ -114,9 +114,9 @@ jobs:
 
       - name: Check reviewdog status
         run: | 
-        if [ "$REVIEWDOG_FAILED" -eq 1 ]; then
-          echo "❌ One or more reviewdog checks failed."
-          exit 1
-        else
-          echo "✅ All reviewdog checks passed."
-        fi
+          if [ "$REVIEWDOG_FAILED" -eq 1 ]; then
+            echo "❌ One or more reviewdog checks failed."
+            exit 1
+          else
+            echo "✅ All reviewdog checks passed."
+          fi
