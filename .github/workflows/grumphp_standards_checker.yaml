@@ -4,7 +4,7 @@ on: pull_request
 
 jobs:
   phpcs-checker:
-    name: 'PHPMD Coding standards validation'
+    name: 'Coding standards validation'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -20,6 +20,9 @@ jobs:
         uses: reviewdog/action-setup@v1
         with:
           reviewdog_version: latest
+        run: |
+          # Initialize REVIEWDOG_FAILED variable
+          REVIEWDOG_FAILED=0
         
       - name: Configuring diff file
         run: |
