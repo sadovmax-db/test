@@ -61,7 +61,7 @@ jobs:
           if [ -s "$STDERR_FILE" ]; then
           cat "$STDERR_FILE" \
             | sed -r "s/([0-9]+)\s+/\1:/gI" \
-            | reviewdog -fail-level=any -f=phpstan -name="PHPMD GrumPHP"  -reporter=github-pr-review -filter-mode=nofilter
+            | reviewdog -fail-level=any -f=phpstan -name="PHPMD GrumPHP"  -reporter=github-pr-review -filter-mode=nofilter || REVIEWDOG_FAILED=1
           else
             echo "No errors found in PHP files. Skipping reviewdog."
           fi
@@ -83,7 +83,7 @@ jobs:
           # Check if STDERR_FILE is non-empty
           if [ -s "$STDERR_FILE" ]; then
             # Pass stderr to reviewdog
-            cat "$STDERR_FILE" | reviewdog -fail-level=any -f=checkstyle -name="PHPCS GrumPHP" -reporter=github-pr-review -filter-mode=nofilter
+            cat "$STDERR_FILE" | reviewdog -fail-level=any -f=checkstyle -name="PHPCS GrumPHP" -reporter=github-pr-review -filter-mode=nofilter || REVIEWDOG_FAILED=1
           else
             echo "No errors found in PHP files. Skipping reviewdog."
           fi
@@ -105,7 +105,7 @@ jobs:
           # Check if STDERR_FILE is non-empty
           if [ -s "$STDERR_FILE" ]; then
             # Pass stderr to reviewdog
-            cat "$STDERR_FILE" | reviewdog -fail-level=any -f=eslint -name="Eslint GrumPHP" -reporter=github-pr-review -filter-mode=nofilter
+            cat "$STDERR_FILE" | reviewdog -fail-level=any -f=eslint -name="Eslint GrumPHP" -reporter=github-pr-review -filter-mode=nofilter || REVIEWDOG_FAILED=1
           else
             echo "No errors found in JS files. Skipping reviewdog."
           fi
