@@ -6,8 +6,9 @@ jobs:
   phpcs-checker:
     name: 'Coding standards validation'
     runs-on: ubuntu-latest
-    container: wodby/php:8.3-dev-4.59.0
-    options: --user root
+    container: 
+      image: wodby/php:8.3-dev-4.59.0
+      options: --user root
     permissions:
       contents: write
       pull-requests: write
