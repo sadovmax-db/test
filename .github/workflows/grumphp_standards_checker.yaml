@@ -6,6 +6,7 @@ jobs:
   phpcs-checker:
     name: 'Coding standards validation'
     runs-on: ubuntu-latest
+    container: wodby/php:8.3-dev
     permissions:
       contents: write
       pull-requests: write
@@ -26,9 +27,9 @@ jobs:
         run: |
           # Add the current directory to the list of safe directories for Git
           git config --global --add safe.directory .
-          GIT_CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r --diff-filter=ACM origin/$GITHUB_BASE_REF origin/$GITHUB_HEAD_REF)        
+          GIT_CHANGED_FILES=$(git diff --name-only origin/$GITHUB_BASE_REF origin/$GITHUB_HEAD_REF | cat)        
           echo "$GIT_CHANGED_FILES"
-          
+                
       - name: Install GrumPHP dependencies
         run: | 
           cd scripts/grumphp && composer install && cd ../..    
@@ -38,16 +39,19 @@ jobs:
           VERSION=$(composer show drupal/core --locked | grep 'versions' | awk '{print $4}')
           echo "Version the drupal/core = $VERSION"
           mkdir -p web/core
-          cd web
-          wget https://git.drupalcode.org/project/drupal/raw/$VERSION/.eslintrc.json
-          wget https://git.drupalcode.org/project/drupal/raw/$VERSION/.eslintignore
-          cd core
-          wget https://git.drupalcode.org/project/drupal/raw/$VERSION/core/.eslintignore
-          wget https://git.drupalcode.org/project/drupal/raw/$VERSION/core/.eslintrc.jquery.json
-          wget https://git.drupalcode.org/project/drupal/raw/$VERSION/core/.eslintrc.json
-          wget https://git.drupalcode.org/project/drupal/raw/$VERSION/core/.eslintrc.legacy.json
-          wget https://git.drupalcode.org/project/drupal/raw/$VERSION/core/.eslintrc.passing.json
-          cd ../..
+          CONFIGS=(
+            ".eslintignore" ".eslintrc.json"
+            "core/.eslintignore"
+            "core/.eslintrc.jquery.json"
+            "core/.eslintrc.json"
+            "core/.eslintrc.legacy.json"
+            "core/.eslintrc.passing.json"
+            "core/.prettierignore"
+            "core/.prettierrc.json"
+          )           
+          for FILE in ${CONFIGS[@]}; do
+            wget -q "https://git.drupalcode.org/project/drupal/raw/$VERSION/$FILE" -O "$FILE"
+          done
       
       - name: Run GrumPHP(PHPMD)
         env:
@@ -67,7 +71,7 @@ jobs:
             | sed -r "s/([0-9]+)\s+/\1:/gI" \
             | reviewdog -fail-level=any -f=phpstan -name="PHPMD GrumPHP"  -reporter=github-pr-review -filter-mode=nofilter || echo REVIEWDOG_FAILED=1 >> $GITHUB_ENV
           else
-            echo "No errors found in PHP files. Skipping reviewdog."
+            echo "No errors found in PHP files (phpmd). Skipping reviewdog."
           fi
           # Clean up temporary files
           rm -f "$STDOUT_FILE" "$STDERR_FILE"
@@ -89,7 +93,7 @@ jobs:
             # Pass stderr to reviewdog
             cat "$STDERR_FILE" | reviewdog -fail-level=any -f=checkstyle -name="PHPCS GrumPHP" -reporter=github-pr-review -filter-mode=nofilter || echo REVIEWDOG_FAILED=1 >> $GITHUB_ENV
           else
-            echo "No errors found in PHP files. Skipping reviewdog."
+            echo "No errors found in PHP files (phpcs). Skipping reviewdog."
           fi
           # Clean up temporary files
           rm -f "$STDOUT_FILE" "$STDERR_FILE"
