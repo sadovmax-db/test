@@ -37,6 +37,7 @@ jobs:
           cd scripts/grumphp && composer install && cd ../..    
       
       - name: Install ESlint dependencies
+        shell: bash
         run: |
           VERSION=$(composer show drupal/core --locked | grep 'versions' | awk '{print $4}')
           echo "Version the drupal/core = $VERSION"
