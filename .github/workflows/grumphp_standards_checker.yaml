@@ -42,6 +42,7 @@ jobs:
           VERSION=$(composer show drupal/core --locked | grep 'versions' | awk '{print $4}')
           echo "Version the drupal/core = $VERSION"
           mkdir -p web/core
+          cd web
           CONFIGS=(
             ".eslintignore" ".eslintrc.json"
             "core/.eslintignore"
@@ -55,6 +56,7 @@ jobs:
           for FILE in ${CONFIGS[@]}; do
             wget -q "https://git.drupalcode.org/project/drupal/raw/$VERSION/$FILE" -O "$FILE"
           done
+          cd ..
       
       - name: Run GrumPHP(PHPMD)
         env:
