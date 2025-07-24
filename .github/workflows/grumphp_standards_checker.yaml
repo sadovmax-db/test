@@ -24,10 +24,11 @@ jobs:
         with:
           reviewdog_version: latest
 
+
       - name: Configuring diff file
         run: |
           # Add the current directory to the list of safe directories for Git
-          git config --global --add safe.directory .
+          git config --global --add safe.directory /__w/test/test
           GIT_CHANGED_FILES=$(git diff --name-only origin/$GITHUB_BASE_REF origin/$GITHUB_HEAD_REF | cat)        
           echo "$GIT_CHANGED_FILES"
                 
