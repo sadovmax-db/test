@@ -1,0 +1,24 @@
+name: 'Project scanning for vulnerabilities'
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  project_vulnerability_scanning:
+    name: 'Trivy project scanning'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install and prepare Trivy for scanning the project.
+        run: |
+          wget https://github.com/aquasecurity/trivy/releases/download/v0.43.1/trivy_0.43.1_Linux-64bit.deb
+          sudo dpkg -i trivy_0.43.1_Linux-64bit.deb
+          cp scripts/trivy/.trivyignore .
+
+      - name: Scanning the project for vulnerabilities, secrets and files misconfiguration
+        run: trivy -q fs --scanners config --scanners vuln --scanners secret . --exit-code 1

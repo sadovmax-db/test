@@ -1,0 +1,18 @@
+{
+    "require-dev": {
+        "phpro/grumphp": "^2.10",
+        "drupal/coder": "^8.3",
+        "phpmd/phpmd": "^2.15"
+    },
+    "config": {
+        "allow-plugins": {
+            "phpro/grumphp": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "./composer_scripts/setup_pre_commit.sh"
+        ]
+    }
+}
