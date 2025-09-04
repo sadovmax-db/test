@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-#
 # Update the values of the variables listed below according to your project.
 # Please be aware: do not use \d in regexp (we must use [0-9] instead).
 #
