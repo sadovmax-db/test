@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+. "$(dirname "$0")"/_config.sh
+
+while read localname localhash remotename remotehash; do
+  # We should validate only branches. Tags and other stuff should be ignored.
+  if [[ $localname != *"refs/heads/"* ]]; then
+    continue
+  fi
+
+  if [[ ! $localname =~ ^refs/heads/${BRANCH_PATTERN}$ ]]; then
+    printf "\n ${RED}[ERROR] Push failed.${NO_COLOR}\n   The branch name isn't valid.\n   Valid branch name pattern is '${BRANCH_SAMPLE}'.\n\n"
+    exit 1
+  fi
+done
