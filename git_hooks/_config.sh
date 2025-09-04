@@ -7,7 +7,7 @@ TASK_SOURCE="Jira"
 TASK_LINK_SAMPLE="MBA-000: Short description."
 TASK_LINK_PATTERN="MBA-[0-9]{1,4}"
 BRANCH_SAMPLE="MBA-000_short_description"
-BRANCH_PATTERN="MBA-[0-9]{1,4}*"
+BRANCH_PATTERN="MBA-[0-9]{1,4}_.*"
 
 # Color codes
 RED="\033[0;31m"
